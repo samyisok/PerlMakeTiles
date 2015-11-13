@@ -21,30 +21,38 @@
 use strict;
 use warnings;
 use utf8;
-use File::Basename qw(fileparse);
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use My::Overview qw(:all);
+use My::Config;
 use Getopt::Long;
 
 my $tmp_dir    = '/tmp/tmp-tiles';
 my $save_tiles = './output_tiles.jpg';
-GetOptions( "save=s" => \$save_tiles )
-  or die "invalid arguments, \n Usage: ./maker_tiles.pl --save output.jpg";
+my $rotate     = 0;
+my $pic_wd     = 900;
+my $tiles      = 2;
+GetOptions(
+    "save=s"   => \$save_tiles,
+    "rotate=i" => \$rotate,
+    "width=i"  => \$pic_wd,
+    "tiles=i"  => \$tiles,
+) or die "invalid arguments, \n Usage: ./maker_tiles.pl --save output.jpg";
 
-my (@list_img) = @ARGV;
+my $config = Config->new(
+    tmp_dir_path     => $tmp_dir,
+    save_file_path   => $save_tiles,
+    tile_count       => $tiles,
+    tile_width       => $pic_wd,
+    rotate_degree    => $rotate,
+    input_pics_array => \@ARGV,
+);
 
-mkdir $tmp_dir unless -e $tmp_dir;
 
-foreach my $filepath (@list_img) {
-    my $filename  = fileparse($filepath);
-    my $save_path = $tmp_dir . "/" . $filename;
-    postwork_img( $filepath, $save_path );
-}
-
-my @tmp_files = glob("$tmp_dir/*.jpg");
-
-make_tiles( $save_tiles, @tmp_files );
-
-clean_dir($tmp_dir)
+mkdir $config->get_tmp_dir_path unless -e $config->get_tmp_dir_path;
+make_postwork($config);
+my @tmp_files = glob($config->get_tmp_dir_path . "/*.jpg");
+$config->set_postwork_pics_array(\@tmp_files);
+make_tiles($config);
+clean_dir( $config->get_tmp_dir_path )
 
