@@ -21,12 +21,14 @@ use warnings;
 use Image::Magick;
 use Exporter qw(import);
 use File::Path 'remove_tree';
+use File::Basename qw(fileparse);
 
-our @EXPORT_OK = qw(clean_dir postwork_img make_tiles);
+   
+our @EXPORT_OK = qw(clean_dir postwork_img make_tiles make_postwork);
 our $VERSION = 0.01;
 our %EXPORT_TAGS = (
     all => [
-        qw(clean_dir postwork_img make_tiles)
+        qw(make_postwork clean_dir postwork_img make_tiles)
     ]
 );
 
@@ -38,23 +40,31 @@ sub clean_dir {
 sub postwork_img {
     my $path_file = shift;
     my $path_output = shift;
+    my $config = shift;
     my $image = Image::Magick->new;
     my $tmp;
     $tmp = $image->Read($path_file);
-    $tmp = $image->Rotate(degrees=>90);
-    $tmp = $image->AdaptiveResize(900);
+    $tmp = $image->Rotate(degrees=>$config->get_rotate_degree);
+    $tmp = $image->AdaptiveResize($config->get_tile_width);
     $tmp = $image->Write($path_output);
 }
 
+sub make_postwork {
+    my $config = shift;
+    foreach my $filepath ( @{$config->get_input_pics_array}) {
+        my $filename  = fileparse($filepath);
+        my $save_path = $config->get_tmp_dir_path . "/" . $filename;
+        postwork_img( $filepath, $save_path, $config );
+    }
+}
+
+
 sub make_tiles {
-    my $path_output = shift;
-    my (@path_array_file) = @_;
+    my $config = shift;
     my $image = Image::Magick->new;
-    my $tmp;
-    $tmp = $image->Read(@path_array_file);
-    print $tmp;
-    my $montage = $image->Montage(Tile=>2, geometry => 900);
-    $montage->Write($path_output);
+    my $tmp = $image->Read(@{$config->get_postwork_pics_array});
+    my $montage = $image->Montage(Tile=>$config->get_tile_count, geometry => $config->get_tile_width);
+    $montage->Write($config->get_save_file_path);
 }
 
 1;
