@@ -39,6 +39,8 @@ GetOptions(
     "tiles=i"  => \$tiles,
 ) or die "invalid arguments, \n Usage: ./maker_tiles.pl --save output.jpg";
 
+die "Empty pic list" unless @ARGV;
+
 my $config = Config->new(
     tmp_dir_path     => $tmp_dir,
     save_file_path   => $save_tiles,
