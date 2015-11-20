@@ -2,7 +2,7 @@
 
 How to use:
 
-    ./maker_tiles.pl --save save_output_file.jpg --degree 90  /Volumes/share/scans/CCF10112015*
+    ./maker_tiles.pl --save save_output_file.jpg --rotate 90  /Volumes/share/scans/CCF10112015*
 
 
 Input:
