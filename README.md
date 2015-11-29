@@ -24,6 +24,6 @@ Output:
 Options:
 
     --rotate 90   #rotate all pics in degrees, default 0
-    --pic_wd 900  #resize width all pics in px, default 900
+    --width 900  #resize width all pics in px, default 900
     --tiles 2     #make rows of pics in final pic, default 2
     --save        #where save final image, default ./output_tiles.jpg
