@@ -53,7 +53,7 @@ my $config = Config->new(
 
 mkdir $config->get_tmp_dir_path unless -e $config->get_tmp_dir_path;
 make_postwork($config);
-my @tmp_files = glob($config->get_tmp_dir_path . "/*.jpg");
+my @tmp_files = glob($config->get_tmp_dir_path . "/*");
 $config->set_postwork_pics_array(\@tmp_files);
 make_tiles($config);
 clean_dir( $config->get_tmp_dir_path )
